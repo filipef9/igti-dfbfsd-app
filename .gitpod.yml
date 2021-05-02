@@ -1,0 +1,14 @@
+image:
+  file: .gitpod.Dockerfile
+
+vscode:
+  extensions:
+    - johnpapa.winteriscoming@1.4.3:RUhqzEkjA39t5TOfnBGZVw==
+    - vscode-icons-team.vscode-icons@11.1.0:Lkmo/9w1LmPw4WtT3CAujA==
+    - msjsdiag.debugger-for-chrome@4.12.6:IdQBlCQEnixzHAOkHC36ew==
+    - esbenp.prettier-vscode@5.9.2:/ZjVG4nabMGxTqOcyglnfQ==
+    - naumovs.color-highlight@2.3.0:6nKORbxgnWjNaN6xACiaQQ==
+    - 42crunch.vscode-openapi@4.3.0:1lJ4aAON5qjBG7sv/A1u6A==
+    - dsznajder.es7-react-js-snippets@3.1.1:3r85sshgGXBFhEFjBIyk3Q==
+    - wakatime.vscode-wakatime
+    - asciidoctor.asciidoctor-vscode
