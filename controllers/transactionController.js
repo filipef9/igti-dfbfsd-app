@@ -1,13 +1,18 @@
+const TransactionModel = require('../models/TransactionModel');
 const transactionModel = require('../models/TransactionModel');
 
 const findAll = async (req, res) => {
     try {
-        const { period } = req.query;
+        const { period, description } = req.query;
         if (!period) {
             return res.status(400).send({ error: 'É necessário informar o parâmetro "period", cujo valor deve estar no formato yyyy-mm' });
         }
 
-        const filter = { yearMonth: period };
+        const filter = (period && description)
+            ? {
+                yearMonth: period, description: { $regex: description, $options: 'i' }
+            }
+            : { yearMonth: period };
         const retrievedTransactions = await transactionModel.find(filter);
 
         res.send({
@@ -52,4 +57,64 @@ const getBalance = async (req, res) => {
     }
 };
 
-module.exports = { findAll, getBalance };
+const getTotalExpenses = async (req, res) => {
+    try {
+        const { period, description } = req.query;
+        if (!period) {
+            return res.status(400).send({ error: 'É necessário informar o parâmetro "period", cujo valor deve estar no formato yyyy-mm' });
+        }
+
+        const filter = (period && description)
+            ? {
+                yearMonth: period, description: { $regex: description, $options: 'i' }
+            }
+            : { yearMonth: period };
+        const retrievedTransactions = await transactionModel.find(filter);
+
+        const totalExpenses = retrievedTransactions
+            .filter(transaction => transaction.type = '-')
+            .reduce((sum, transaction) => sum + transaction.value, 0);
+
+        res.send({
+            yearMonth: period,
+            totalExpenses
+        });
+    } catch (err) {
+        res.status(400).send({ message: err.message });
+    }
+};
+
+const createIncome = async (req, res) => {
+    try {
+        const { value, yearMonthDay, description } = req.body;
+        const [year, month, day] = yearMonthDay.split('-');
+        const yearMonth = `${year}-${month}`;
+        const category = 'Receita';
+        const type = '+';
+
+        const newTransactionIncome = new TransactionModel({ value, description, category, yearMonthDay, yearMonth, year, month, day, type });
+        await newTransactionIncome.save();
+
+        res.send({ message: 'Receita inserida com sucesso.' });
+    } catch (err) {
+        res.status(400).send({ message: err.message });
+    }
+};
+
+const createExpense = async (req, res) => {
+    try {
+        const { value, yearMonthDay, description, category } = req.body;
+        const [year, month, day] = yearMonthDay.split('-');
+        const yearMonth = `${year}-${month}`;
+        const type = '-';
+
+        const newTransactionIncome = new TransactionModel({ value, description, category, yearMonthDay, yearMonth, year, month, day, type });
+        await newTransactionIncome.save();
+
+        res.send({ message: 'Despesa inserida com sucesso.' });
+    } catch (err) {
+        res.status(400).send({ message: err.message });
+    }
+};
+
+module.exports = { findAll, getBalance, getTotalExpenses, createIncome, createExpense };
