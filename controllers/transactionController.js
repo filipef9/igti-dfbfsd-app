@@ -1,6 +1,9 @@
 const TransactionModel = require('../models/TransactionModel');
 const transactionModel = require('../models/TransactionModel');
 
+const RECEITA = '+';
+const DESPESA = '-';
+
 const findAll = async (req, res) => {
     try {
         const { period, description, category } = req.query;
@@ -9,7 +12,7 @@ const findAll = async (req, res) => {
         }
 
         const filter = { yearMonth: period };
-        
+
         if (description) {
             filter.description = { $regex: description, $options: 'i' };
         }
@@ -18,11 +21,23 @@ const findAll = async (req, res) => {
             filter.category = { $regex: category, $options: 'i' };
         }
 
-        console.log(filter);
         const retrievedTransactions = await transactionModel.find(filter);
 
+        const totalIncomes = retrievedTransactions
+            .filter(transaction => transaction.type === RECEITA)
+            .reduce((sum, income) => sum + income.value, 0);
+
+        const totalExpenses = retrievedTransactions
+            .filter(transaction => transaction.type === DESPESA)
+            .reduce((sum, expense) => sum + expense.value, 0);
+
+        const balance = totalIncomes - totalExpenses;
+
         res.send({
-            length: retrievedTransactions.length,
+            totalTransactions: retrievedTransactions.length,
+            totalIncomes,
+            totalExpenses,
+            balance,
             transactions: retrievedTransactions
         });
     } catch (err) {
@@ -71,7 +86,7 @@ const getTotalExpenses = async (req, res) => {
         }
 
         const filter = { yearMonth: period };
-        
+
         if (description) {
             filter.description = { $regex: description, $options: 'i' };
         }
