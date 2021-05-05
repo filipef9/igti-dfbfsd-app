@@ -3,16 +3,22 @@ const transactionModel = require('../models/TransactionModel');
 
 const findAll = async (req, res) => {
     try {
-        const { period, description } = req.query;
+        const { period, description, category } = req.query;
         if (!period) {
             return res.status(400).send({ error: 'É necessário informar o parâmetro "period", cujo valor deve estar no formato yyyy-mm' });
         }
 
-        const filter = (period && description)
-            ? {
-                yearMonth: period, description: { $regex: description, $options: 'i' }
-            }
-            : { yearMonth: period };
+        const filter = { yearMonth: period };
+        
+        if (description) {
+            filter.description = { $regex: description, $options: 'i' };
+        }
+
+        if (category) {
+            filter.category = { $regex: category, $options: 'i' };
+        }
+
+        console.log(filter);
         const retrievedTransactions = await transactionModel.find(filter);
 
         res.send({
@@ -59,16 +65,22 @@ const getBalance = async (req, res) => {
 
 const getTotalExpenses = async (req, res) => {
     try {
-        const { period, description } = req.query;
+        const { period, description, category } = req.query;
         if (!period) {
             return res.status(400).send({ error: 'É necessário informar o parâmetro "period", cujo valor deve estar no formato yyyy-mm' });
         }
 
-        const filter = (period && description)
-            ? {
-                yearMonth: period, description: { $regex: description, $options: 'i' }
-            }
-            : { yearMonth: period };
+        const filter = { yearMonth: period };
+        
+        if (description) {
+            filter.description = { $regex: description, $options: 'i' };
+        }
+
+        if (category) {
+            filter.category = { $regex: category, $options: 'i' };
+        }
+
+        console.log(filter);
         const retrievedTransactions = await transactionModel.find(filter);
 
         const totalExpenses = retrievedTransactions
