@@ -12,7 +12,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({origin: 'https://3000-tomato-badger-6bghk6od.ws-us03.gitpod.io'}));
 app.use(express.json());
 
 /**
